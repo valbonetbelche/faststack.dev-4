@@ -1,6 +1,7 @@
 ├── .gitignore
 ├── README.md
 ├── backend
+│   ├── .env.local
 │   ├── Dockerfile
 │   ├── app
 │   │   ├── api
@@ -22,16 +23,20 @@
 │   │   │   ├── core.py
 │   │   │   └── user.py
 │   │   ├── db
-│   │   │   ├── base.py
-│   │   │   ├── models.py
 │   │   │   └── session.py
 │   │   ├── main.py
 │   │   ├── models
+│   │   │   ├── auth.py
+│   │   │   ├── base.py
+│   │   │   ├── billing.py
+│   │   │   └── stripe.py
 │   │   ├── schemas
 │   │   │   ├── auth.py
 │   │   │   ├── billing.py
 │   │   │   ├── core.py
 │   │   │   └── user.py
+│   │   ├── scripts
+│   │   │   └── seed_plans.py
 │   │   └── utils
 │   │       ├── clerk.py
 │   │       ├── exceptions.py
@@ -40,6 +45,7 @@
 │   ├── requirements.txt
 │   └── tests
 ├── code_tree.txt
+├── docker-compose.yml
 ├── frontend
 │   ├── .env.local
 │   ├── Dockerfile
@@ -98,5 +104,4 @@
 │   │   ├── middleware.ts
 │   │   └── types.ts
 │   └── tsconfig.json
-├── generate_code_tree.py
-└── terraform_combined.txt
+└── generate_code_tree.py

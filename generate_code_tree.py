@@ -34,28 +34,9 @@ def generate_tree(path=".", prefix=""):
             tree_lines.extend(generate_tree(full_path, prefix + extension))
     return tree_lines
 
-def combine_terraform_files_content():
-    # Define the directory and output file
-    terraform_dir = "terraform"
-    output_file = "terraform_combined.txt"
-    with open(output_file, "w", encoding="utf-8") as out_file:
-        for root, _, files in os.walk(terraform_dir):
-            for file in files:
-                if file.endswith(".tf"):
-                    file_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(file_path, start=os.getcwd())
-                    out_file.write(f"{relative_path}\n")
-                    out_file.write("-" * len(relative_path) + "\n")
-                    with open(file_path, "r", encoding="utf-8") as tf_file:
-                        out_file.write(tf_file.read())
-                    out_file.write("\n\n")  # spacing between files
-    print(f"Terraform files combined into {output_file}")
-
-
 
 if __name__ == "__main__":
     tree = generate_tree(".")
     with open("code_tree.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(tree))
     print("✅ code_tree.txt generated successfully.")
-    combine_terraform_files_content()

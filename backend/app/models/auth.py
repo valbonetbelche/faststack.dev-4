@@ -9,6 +9,7 @@ from jwt import PyJWKClient
 from starlette.status import HTTP_403_FORBIDDEN
 from typing_extensions import Annotated, Doc
 from pydantic import BaseModel
+from app.utils.clerk import clerk_client
 
 
 class ClerkConfig(BaseModel):
@@ -87,6 +88,13 @@ class ClerkHTTPBearer(HTTPBearer):
             if self.debug_mode:
                 raise e
             return None
+        
+    def get_user_id_from_token(token: str) -> str:
+        """Extract user ID (sub) from decoded JWT"""
+        decoded = clerk_client._decode_token(token)
+        if not decoded or "sub" not in decoded:
+            raise HTTPException(status_code=403, detail="Invalid token or missing user ID")
+        return decoded["sub"]
 
     async def __call__(self, request: Request) -> Optional[HTTPAuthorizationCredentials]:
         authorization = request.headers.get("Authorization")

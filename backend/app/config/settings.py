@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     
     # Clerk
+    CLERK_API_URL: str
     CLERK_SECRET_KEY: str
     CLERK_JWKS_ENDPOINT: str
     CLERK_JWT_AUDIENCE: str

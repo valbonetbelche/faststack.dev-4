@@ -21,6 +21,7 @@ from app.schemas.billing import (
 )
 from app.api.deps import get_current_user
 from app.config.settings import settings
+from app.utils.clerk import clerk_client
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -123,7 +124,7 @@ async def stripe_webhook(
         if event.type == "checkout.session.completed":
             await handle_checkout_completed(event.data.object, db)
         elif event.type == "customer.subscription.updated":
-            await handle_subscription_updated(event.data.object, db)
+            print("Received webhook for subscription update")
         elif event.type == "customer.subscription.deleted":
             await handle_subscription_cancelled(event.data.object, db)
 
@@ -146,16 +147,14 @@ async def handle_checkout_completed(session: dict, db: Session):
 
     try:
         subscription = stripe_service.get_subscription(subscription_id)
-        plan_id = get_subscription_plan_id_from_stripe_price_id(
-            db, 
-            subscription.plan.id
-        )
+        plan_id = get_subscription_plan_id_from_stripe_price_id(db, subscription.plan.id)
         
         plan = get_subscription_plan_by_id(db, plan_id)
         if not plan:
             logger.error(f"Plan not found for price ID: {subscription.plan.id}")
             return
 
+        # Update database
         subscription_data = {
             'user_id': user_id,
             'stripe_customer_id': session.customer,
@@ -166,12 +165,22 @@ async def handle_checkout_completed(session: dict, db: Session):
             'current_period_end': datetime.fromtimestamp(subscription.current_period_end),
             'cancel_at_period_end': subscription.cancel_at_period_end
         }
-        
         upsert_customer_subscription(db, subscription_data)
-        logger.info(f"Subscription created/updated for user {user_id}")
+        print("UPTADING METADATA")
+        # Update Clerk metadata
+        metadata = {
+            "subscription_status": subscription.status,
+            "subscription_plan": plan.name,
+            "subscription_end": datetime.fromtimestamp(subscription.current_period_end).isoformat(),
+            "cancel_at_period_end": subscription.cancel_at_period_end
+        }
+        
+        await clerk_client.update_user_metadata(user_id, metadata)
+        logger.info(f"Subscription and Clerk metadata updated for user {user_id}")
 
     except Exception as e:
         logger.error(f"Error handling checkout completed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 async def handle_subscription_updated(subscription: dict, db: Session):
     """Handle subscription updates from Stripe"""
