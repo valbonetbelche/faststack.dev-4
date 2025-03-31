@@ -1,8 +1,8 @@
 export interface PublicMetadata {
-  subscription_status: string; // e.g., "active", "inactive"
-  subscription_plan: string; // e.g., "Professional", "Basic"
-  subscription_end: string; // ISO date string
-  last_checked: string; // ISO date string
+  subscription_status?: string; // e.g., "active", "inactive"
+  subscription_plan?: string; // e.g., "Professional", "Basic"
+  subscription_end?: string; // ISO date string
+  last_checked?: string; // ISO date string
   onboardingComplete?: boolean; // Optional
   [key: string]: any; // Allow additional metadata fields
 }

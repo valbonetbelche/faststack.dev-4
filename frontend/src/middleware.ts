@@ -4,7 +4,7 @@ import {
 } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from "next/server";
-import type { SessionClaims } from './types'; // Import the types
+import type { PublicMetadata, SessionClaims } from './types'; // Import the types
 import { api } from "@/lib/api";
 
 const SUBSCRIPTION_PATHS = [
@@ -81,11 +81,15 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 async function validateSubscription(claims: SessionClaims, token: string): Promise<boolean> {
-  const publicMetadata = claims?.publicMetadata || {};
+  const publicMetadata = claims?.publicMetadata as PublicMetadata;
   const subscriptionStatus = publicMetadata.subscription_status;
   const subscriptionPlan = publicMetadata.subscription_plan;
-  const subscriptionEnd = new Date(publicMetadata.subscription_end);
-  const lastChecked = new Date(publicMetadata.last_checked);
+  if (!subscriptionStatus || !subscriptionPlan) {
+    console.error('Missing subscription metadata');
+    return false;
+  }
+  const subscriptionEnd = publicMetadata.subscription_end ? new Date(publicMetadata.subscription_end) : new Date(0); // Default to epoch if undefined
+  const lastChecked = new Date(publicMetadata.last_checked || 0); // Default to epoch if undefined
   const now = new Date();
 
   // Check if it's been more than 1 hour since last_checked
