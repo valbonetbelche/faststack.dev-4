@@ -1,0 +1,102 @@
+├── .gitignore
+├── README.md
+├── backend
+│   ├── Dockerfile
+│   ├── app
+│   │   ├── api
+│   │   │   ├── deps.py
+│   │   │   └── v1
+│   │   │       ├── auth
+│   │   │       │   └── router.py
+│   │   │       ├── billing
+│   │   │       │   └── router.py
+│   │   │       ├── core
+│   │   │       │   └── router.py
+│   │   │       └── user
+│   │   │           └── router.py
+│   │   ├── config
+│   │   │   └── settings.py
+│   │   ├── crud
+│   │   │   ├── auth.py
+│   │   │   ├── billing.py
+│   │   │   ├── core.py
+│   │   │   └── user.py
+│   │   ├── db
+│   │   │   ├── base.py
+│   │   │   ├── models.py
+│   │   │   └── session.py
+│   │   ├── main.py
+│   │   ├── models
+│   │   ├── schemas
+│   │   │   ├── auth.py
+│   │   │   ├── billing.py
+│   │   │   ├── core.py
+│   │   │   └── user.py
+│   │   └── utils
+│   │       ├── clerk.py
+│   │       ├── exceptions.py
+│   │       ├── logging.py
+│   │       └── stripe.py
+│   ├── requirements.txt
+│   └── tests
+├── code_tree.txt
+├── frontend
+│   ├── .env.local
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── components.json
+│   ├── next-env.d.ts
+│   ├── next.config.ts
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.mjs
+│   ├── public
+│   │   ├── file.svg
+│   │   ├── globe.svg
+│   │   ├── next.svg
+│   │   ├── vercel.svg
+│   │   └── window.svg
+│   ├── src
+│   │   ├── app
+│   │   │   ├── (auth)
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── sign-in
+│   │   │   │   │   └── [[...sign-in]]
+│   │   │   │   │       └── page.tsx
+│   │   │   │   └── sign-up
+│   │   │   │       └── [[...sign-up]]
+│   │   │   │           └── page.tsx
+│   │   │   ├── (dashboard)
+│   │   │   │   ├── dashboard
+│   │   │   │   │   ├── billing
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── onboarding
+│   │   │   │   │   │   ├── complete-onboarding-form.tsx
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── layout.tsx
+│   │   │   ├── favicon.ico
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── components
+│   │   │   ├── theme-provider.tsx
+│   │   │   └── ui
+│   │   │       ├── alert.tsx
+│   │   │       ├── badge.tsx
+│   │   │       ├── button.tsx
+│   │   │       ├── card.tsx
+│   │   │       ├── dropdown-menu.tsx
+│   │   │       ├── input.tsx
+│   │   │       ├── label.tsx
+│   │   │       ├── select.tsx
+│   │   │       ├── sonner.tsx
+│   │   │       └── theme-toggle.tsx
+│   │   ├── lib
+│   │   │   ├── api.ts
+│   │   │   └── utils.ts
+│   │   ├── middleware.ts
+│   │   └── types.ts
+│   └── tsconfig.json
+├── generate_code_tree.py
+└── terraform_combined.txt

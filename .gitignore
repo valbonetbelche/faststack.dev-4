@@ -1,0 +1,81 @@
+# --- General ---
+*.log
+*.env
+.env.*
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+*.bak
+*.tmp
+*.orig
+
+# --- Python (FastAPI) ---
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+# Virtual environments
+venv/
+env/
+.venv/
+# Test and coverage reports
+htmlcov/
+.coverage
+.tox/
+.cache/
+pytest_cache/
+# Jupyter Notebooks (if used)
+.ipynb_checkpoints/
+# mypy
+.mypy_cache/
+
+# --- Node.js (Next.js) ---
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# .env.local and other custom environments
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Vercel
+.vercel/
+# Build outputs
+dist/
+build/
+
+# --- OS / Editor Specific ---
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+*.tmproj
+*.vscode/
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# --- Docker ---
+*.pid
+*.pid.lock
+
+# --- Optional ---
+# Ignore SQLite DB if you're using it locally for dev
+*.sqlite3
+
+# --- Custom ---
+# Ignore local certificates or other secrets
+*.pem
+*.key
+*.crt
+*.csr
+
+.srl
