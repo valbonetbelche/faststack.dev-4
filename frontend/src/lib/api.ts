@@ -62,7 +62,7 @@ export const api = {
   },
 
   getCurrentSubscription: async (token: string) => {
-    const response = await apiClient.get("/billing/subscription/current", {
+    const response = await apiClient.get("/billing/subscription/current/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -71,7 +71,7 @@ export const api = {
   },
 
   updateSubscriptionMetadata: async (token: string) => {
-    const response = await apiClient.get("/billing/subscription/update-metadata", {
+    const response = await apiClient.post("/billing/subscription/update-metadata", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
