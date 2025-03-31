@@ -7,3 +7,5 @@ stripe
 requests
 pydantic
 pydantic-settings
+PyJWT
+cryptography

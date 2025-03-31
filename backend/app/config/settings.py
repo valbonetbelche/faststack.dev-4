@@ -9,11 +9,15 @@ class Settings(BaseSettings):
     
     # Clerk
     CLERK_SECRET_KEY: str
+    CLERK_JWKS_ENDPOINT: str
+    CLERK_JWT_AUDIENCE: str
+    CLERK_JWT_ISSUER: str
     CLERK_PUBLISHABLE_KEY: Optional[str] = None  # For frontend
     CLERK_JWT_PUBLIC_KEY: Optional[str] = None
     CLERK_WEBHOOK_SECRET: Optional[str] = None
     
     # Stripe
+    FRONTEND_URL: str
     STRIPE_SECRET_KEY: str
     STRIPE_WEBHOOK_SECRET: str
     STRIPE_PUBLISHABLE_KEY: Optional[str] = None  # For frontend
@@ -34,7 +38,3 @@ class Settings(BaseSettings):
         extra = "ignore"  # Silently ignore extra env vars
 
 settings = Settings()
-
-print(f"Loading settings from: {os.path.abspath('.env.local')}")
-print(f"DATABASE_URL from env: {os.getenv('DATABASE_URL')}")
-print(f"DATABASE_URL will be: {settings.DATABASE_URL}")
