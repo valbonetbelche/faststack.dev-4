@@ -106,6 +106,32 @@ async def get_current_subscription(
     
     return subscription
 
+@router.post("/subscription/update-metadata")
+async def update_subscription_metadata(
+    user_data: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update Clerk metadata with subscription details"""
+    user_id = user_data.get("sub")
+    
+    subscription = db.query(CustomerSubscription).filter(
+        CustomerSubscription.user_id == user_id
+    ).first()
+    
+    if not subscription:
+        raise HTTPException(status_code=404, detail="No active subscription found")
+
+    metadata = {
+        "subscription_status": subscription.status,
+        "subscription_plan": subscription.plan.name,
+        "subscription_end": subscription.current_period_end.isoformat(),
+        "cancel_at_period_end": subscription.cancel_at_period_end,
+        "last_checked": datetime.utcnow().isoformat()
+    }
+    
+    await clerk_client.update_user_metadata(user_id, metadata)
+    return {"status": "metadata updated"}
+
 @router.post("/webhook/stripe")
 async def stripe_webhook(
     request: Request,
@@ -166,13 +192,13 @@ async def handle_checkout_completed(session: dict, db: Session):
             'cancel_at_period_end': subscription.cancel_at_period_end
         }
         upsert_customer_subscription(db, subscription_data)
-        print("UPTADING METADATA")
         # Update Clerk metadata
         metadata = {
             "subscription_status": subscription.status,
             "subscription_plan": plan.name,
             "subscription_end": datetime.fromtimestamp(subscription.current_period_end).isoformat(),
-            "cancel_at_period_end": subscription.cancel_at_period_end
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "last_checked": datetime.utcnow().isoformat()
         }
         
         await clerk_client.update_user_metadata(user_id, metadata)

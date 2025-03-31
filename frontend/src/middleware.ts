@@ -42,24 +42,27 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(signInUrl);
   }
 
-  try {
-    const token = await getToken();
-    if (token) {
-      const subscriptionCheck = await checkSubscriptionStatus(token);
-      
-      if (!subscriptionCheck.has_active_subscription) {
-        // Redirect to billing page with error
-        const billingUrl = new URL('/billing', req.url);
-        billingUrl.searchParams.set('error', 'subscription_required');
-        return NextResponse.redirect(billingUrl);
+  // Restrict subscription-protected routes
+  if (SUBSCRIPTION_PATHS.some(path => pathname.startsWith(path))) {
+    try {
+      const token = await getToken();
+      if (token) {
+        const subscriptionCheck = await validateSubscription(claims, token);
+
+        if (!subscriptionCheck) {
+          // Redirect to billing page with error
+          const billingUrl = new URL('/billing', req.url);
+          billingUrl.searchParams.set('error', 'subscription_required');
+          return NextResponse.redirect(billingUrl);
+        }
+      } else {
+        throw new Error('Token is null');
       }
-    } else {
-      throw new Error('Token is null');
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      // On error, allow the request to continue - the client-side check will handle it
+      return NextResponse.next();
     }
-  } catch (error) {
-    console.error('Error checking subscription:', error);
-    // On error, allow the request to continue - the client-side check will handle it
-    return NextResponse.next();
   }
 
   // Handle onboarding flow
@@ -77,14 +80,34 @@ export default clerkMiddleware(async (auth, req) => {
   return NextResponse.next();
 });
 
-async function checkSubscriptionStatus(token: string) {
-  try {
-    const response = await api.getCurrentSubscription(token);
-    return response;
-  } catch (error) {
-    console.error('Failed to verify subscription:', error);
-    throw new Error('Failed to verify subscription');
+async function validateSubscription(claims: SessionClaims, token: string): Promise<boolean> {
+  const publicMetadata = claims?.publicMetadata || {};
+  const subscriptionStatus = publicMetadata.subscription_status;
+  const subscriptionPlan = publicMetadata.subscription_plan;
+  const subscriptionEnd = new Date(publicMetadata.subscription_end);
+  const lastChecked = new Date(publicMetadata.last_checked);
+  const now = new Date();
+
+  // Check if it's been more than 1 hour since last_checked
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+  if (lastChecked < oneHourAgo) {
+    // Request backend to update metadata
+    try {
+      await api.updateSubscriptionMetadata(token);
+      // Assume backend updates Clerk metadata and refreshes the session token
+      return true; // Allow access after backend updates
+    } catch (error) {
+      console.error('Failed to update subscription metadata:', error);
+      return false;
+    }
   }
+
+  // If within 1 hour, validate subscription locally
+  return (
+    subscriptionStatus === 'active' &&
+    subscriptionEnd > now &&
+    SUBSCRIPTION_PATHS.includes(subscriptionPlan)
+  );
 }
 
 export const config = {

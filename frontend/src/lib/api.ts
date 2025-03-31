@@ -70,6 +70,15 @@ export const api = {
     return response.data;
   },
 
+  updateSubscriptionMetadata: async (token: string) => {
+    const response = await apiClient.get("/billing/subscription/update-metadata", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
   // Auth Service
   login: async (credentials: { email: string; password: string }) => {
     const response = await apiClient.post("/auth/login/", credentials);
