@@ -11,6 +11,7 @@ class ClerkClient:
         
     async def update_user_metadata(self, user_id: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """Update Clerk user public metadata"""
+        print(f"Updating metadata for user {user_id}: {metadata}")
         url = f"{self.api_url}/users/{user_id}/metadata"
         headers = {
             "Authorization": f"Bearer {self.api_key}",

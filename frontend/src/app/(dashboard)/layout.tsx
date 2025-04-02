@@ -1,7 +1,7 @@
 // app/(dashboard)/layout.tsx
 import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
-import { Home, Settings, CreditCard, User } from "lucide-react"
+import { Home, Settings, CreditCard, User, Pen, ChartArea } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 const sidebarNavItems = [
@@ -24,6 +24,16 @@ const sidebarNavItems = [
     title: "Profile",
     href: "/dashboard/profile",
     icon: User,
+  },
+  {
+    title: "Notes",
+    href: "/dashboard/notes",
+    icon: Pen,
+  },
+  {
+    title: "Reports",
+    href: "/dashboard/reports",
+    icon: ChartArea,
   },
 ]
 

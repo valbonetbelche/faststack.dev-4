@@ -1,5 +1,6 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 import logging
@@ -112,13 +113,15 @@ async def update_subscription_metadata(
     db: Session = Depends(get_db)
 ):
     """Update Clerk metadata with subscription details"""
+    print("Updating subscription metadata")
     user_id = user_data.get("sub")
-    
+    print(f"User ID: {user_id}")
     subscription = db.query(CustomerSubscription).filter(
         CustomerSubscription.user_id == user_id
     ).first()
     
     if not subscription:
+        print("No active subscription found")
         raise HTTPException(status_code=404, detail="No active subscription found")
 
     metadata = {
@@ -128,9 +131,11 @@ async def update_subscription_metadata(
         "cancel_at_period_end": subscription.cancel_at_period_end,
         "last_checked": datetime.utcnow().isoformat()
     }
-    
+    print(f"Metadata to update: {metadata}")
     await clerk_client.update_user_metadata(user_id, metadata)
-    return {"status": "metadata updated"}
+    print("Clerk metadata updated successfully")
+
+    return JSONResponse(content={"message": "Metadata updated successfully"}, status_code=200)
 
 @router.post("/webhook/stripe")
 async def stripe_webhook(

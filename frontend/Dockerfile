@@ -1,17 +1,20 @@
-# ./frontend/Dockerfile
-FROM node:18-alpine
+# Use the official Node.js image
+FROM node:18
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package.json package-lock.json ./
-RUN npm ci
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Copy all files
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Expose the port Next.js uses
+EXPOSE 3000
 
-# Start the production server
+# Start the development server
 CMD ["npm", "run", "dev"]

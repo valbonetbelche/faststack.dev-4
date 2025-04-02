@@ -1,18 +1,54 @@
 import axios from "axios";
 
 // Base URL for the backend API
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
-
+const PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+const PRIVATE_BASE_URL = process.env.NEXT_PRIVATE_API_BASE_URL || "http://backend:8000/api/v1";
 // Create an Axios instance
-const apiClient = axios.create({
-  baseURL: BASE_URL,
+const publicApiClient = axios.create({
+  baseURL: PUBLIC_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const privateApiClient = axios.create({
+  baseURL: PRIVATE_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 // Add a response interceptor to handle errors globally
-apiClient.interceptors.response.use(
+publicApiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // Handle specific error statuses
+      switch (error.response.status) {
+        case 401:
+          // Redirect to login or refresh token
+          console.error("Unauthorized: Please log in.");
+          break;
+        case 404:
+          console.error("Resource not found.");
+          break;
+        case 500:
+          console.error("Server error. Please try again later.");
+          break;
+        default:
+          console.error("An error occurred:", error.message);
+      }
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Request setup error:", error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle errors globally
+privateApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
@@ -41,10 +77,10 @@ apiClient.interceptors.response.use(
 );
 
 // API methods
-export const api = {
+export const publicApi = {
   // Billing Service
   getPlans: async (token: string) => {
-    const response = await apiClient.get("/billing/plans/", {
+    const response = await publicApiClient.get("/billing/plans/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -53,7 +89,7 @@ export const api = {
   },
 
   createCheckoutSession: async (data: { plan_id: number }, token: string) => {
-    const response = await apiClient.post("/billing/subscription/checkout", data, {
+    const response = await publicApiClient.post("/billing/subscription/checkout", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -62,16 +98,7 @@ export const api = {
   },
 
   getCurrentSubscription: async (token: string) => {
-    const response = await apiClient.get("/billing/subscription/current/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  },
-
-  updateSubscriptionMetadata: async (token: string) => {
-    const response = await apiClient.post("/billing/subscription/update-metadata", {
+    const response = await publicApiClient.get("/billing/subscription/current/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -81,13 +108,13 @@ export const api = {
 
   // Auth Service
   login: async (credentials: { email: string; password: string }) => {
-    const response = await apiClient.post("/auth/login/", credentials);
+    const response = await publicApiClient.post("/auth/login/", credentials);
     return response.data;
   },
 
   // User Service
   getUserProfile: async (userId: string, token: string) => {
-    const response = await apiClient.get(`/user/profile/${userId}/`, {
+    const response = await publicApiClient.get(`/user/profile/${userId}/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -95,3 +122,7 @@ export const api = {
     return response.data;
   },
 };
+
+
+export const privateApi = {
+}
