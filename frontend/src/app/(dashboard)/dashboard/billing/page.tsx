@@ -1,10 +1,10 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { publicApi } from "@/lib/api";
 import {
@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SpinningLoader from "@/components/ui/spinning-loader";
 
 // Define the Plan type based on your schema
 type Plan = {
@@ -38,6 +39,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [fadeIn, setFadeIn] = useState(false); // State for fade-in effect
 
   // Fetch plans from the backend
   useEffect(() => {
@@ -54,6 +56,7 @@ export default function BillingPage() {
         toast.error("Failed to load subscription plans. Please try again later.");
       } finally {
         setLoading(false);
+        setTimeout(() => setFadeIn(true), 100); // Trigger fade-in after loading
       }
     };
 
@@ -96,19 +99,19 @@ export default function BillingPage() {
       if (token) {
         const url = await publicApi.getStripeBillingUrl(token);
         console.log(url);
-        window.open(url, "_blank")
+        window.open(url, "_blank");
       }
     } catch (error) {
-        console.error("Failed to set the Stripe Billing Url:", error);
-      }
-    };
+      console.error("Failed to set the Stripe Billing Url:", error);
+    }
+  };
 
   if (loading) {
-    return <div>Loading plans...</div>;
+    return <SpinningLoader />;
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className={`container mx-auto py-8 transition-opacity duration-500 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
       {showDialog && (
         <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
           <AlertDialogContent>
@@ -123,7 +126,7 @@ export default function BillingPage() {
         </AlertDialog>
       )}
 
-      {isLoaded && user?.publicMetadata.subscription_status && (
+      {isLoaded && user?.publicMetadata.subscription_status as Boolean && (
         <div className="mb-8 p-6 border rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Your Subscription</h2>
           <p className="mb-2">
@@ -132,12 +135,12 @@ export default function BillingPage() {
           <p className="mb-2">
             <strong>Renewal Date:</strong> {user?.publicMetadata.subscription_end ? new Date(user?.publicMetadata.subscription_end as string).toLocaleDateString() : "N/A"}
           </p>
-            <Button
+          <Button
             onClick={fetchStripePortalSession} // Opens the Stripe billing portal
             className="mt-4"
-            >
+          >
             Manage Subscription
-            </Button>
+          </Button>
         </div>
       )}
 
