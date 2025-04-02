@@ -106,6 +106,15 @@ export const publicApi = {
     return response.data;
   },
 
+  getStripeBillingUrl: async (token: string) => {
+    const response = await publicApiClient.get("/billing/subscription/billing-portal", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.billing_portal_url;
+  },
+
   // Auth Service
   login: async (credentials: { email: string; password: string }) => {
     const response = await publicApiClient.post("/auth/login/", credentials);

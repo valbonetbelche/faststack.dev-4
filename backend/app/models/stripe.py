@@ -4,6 +4,7 @@ from typing import Optional
 import os
 from fastapi import HTTPException
 
+
 class StripeServiceError(Exception):
     pass
 
@@ -84,6 +85,19 @@ class StripeService:
             return self.stripe.Subscription.retrieve(subscription_id)
         except stripe.error.StripeError as e:
             raise StripeServiceError(f"Error retrieving subscription: {str(e)}")
+        
+    def create_portal_session(self, customer_id: str, return_url: str) -> stripe.billing_portal.Session:
+        """Create a Stripe Billing Portal session for a customer"""
+        try:
+            session = self.stripe.billing_portal.Session.create(
+                customer=customer_id,
+                return_url=return_url
+            )
+            return session
+        except self.stripe.error.StripeError as e:
+            raise StripeServiceError(f"Error creating billing portal session: {str(e)}")
+        except Exception as e:
+            raise StripeServiceError(f"Unexpected error: {str(e)}")
 
 # Create a singleton instance
 stripe_service = StripeService()

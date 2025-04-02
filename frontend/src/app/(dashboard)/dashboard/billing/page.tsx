@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation"; // Import useSearchParams
+import { useAuth, useUser } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { publicApi } from "@/lib/api";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -33,11 +32,12 @@ type Plan = {
 
 export default function BillingPage() {
   const { getToken } = useAuth();
-  const searchParams = useSearchParams(); // Access query parameters
+  const { user, isLoaded } = useUser();
+  const searchParams = useSearchParams();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState(""); // State for dialog message
+  const [dialogMessage, setDialogMessage] = useState("");
 
   // Fetch plans from the backend
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function BillingPage() {
       try {
         const token = await getToken();
         if (token) {
-          const data = await publicApi.getPlans(token); // Pass the token to the API method
+          const data = await publicApi.getPlans(token);
           setPlans(data);
         } else {
           toast.error("Failed to authenticate. Please log in.");
@@ -63,7 +63,6 @@ export default function BillingPage() {
   // Check for query parameters and set dialog state
   useEffect(() => {
     const error = searchParams.get("error");
-    console.log("Error from query params:", error); // Log the error for debugging
     if (error) {
       setShowDialog(true);
       if (error === "subscription_required") {
@@ -81,8 +80,8 @@ export default function BillingPage() {
     try {
       const token = await getToken();
       if (token) {
-        const { checkout_url } = await publicApi.createCheckoutSession({ plan_id: planId }, token); // Pass the token to the API method
-        window.location.href = checkout_url; // Redirect to Stripe checkout
+        const { checkout_url } = await publicApi.createCheckoutSession({ plan_id: planId }, token);
+        window.location.href = checkout_url;
       } else {
         toast.error("Failed to authenticate. Please log in.");
       }
@@ -91,18 +90,30 @@ export default function BillingPage() {
     }
   };
 
+  const fetchStripePortalSession = async () => {
+    try {
+      const token = await getToken();
+      if (token) {
+        const url = await publicApi.getStripeBillingUrl(token);
+        console.log(url);
+        window.open(url, "_blank")
+      }
+    } catch (error) {
+        console.error("Failed to set the Stripe Billing Url:", error);
+      }
+    };
+
   if (loading) {
     return <div>Loading plans...</div>;
   }
 
   return (
     <div className="container mx-auto py-8">
-      {/* Alert Dialog */}
       {showDialog && (
         <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Access Restricted</AlertDialogTitle>
+              <AlertDialogTitle>Oops</AlertDialogTitle>
               <AlertDialogDescription>{dialogMessage}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -112,6 +123,25 @@ export default function BillingPage() {
         </AlertDialog>
       )}
 
+      {isLoaded && user?.publicMetadata.subscription_status && (
+        <div className="mb-8 p-6 border rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Your Subscription</h2>
+          <p className="mb-2">
+            <strong>Plan:</strong> {String(user?.publicMetadata.subscription_plan as string || "")}
+          </p>
+          <p className="mb-2">
+            <strong>Renewal Date:</strong> {user?.publicMetadata.subscription_end ? new Date(user?.publicMetadata.subscription_end as string).toLocaleDateString() : "N/A"}
+          </p>
+            <Button
+            onClick={fetchStripePortalSession} // Opens the Stripe billing portal
+            className="mt-4"
+            >
+            Manage Subscription
+            </Button>
+        </div>
+      )}
+
+      {/* Subscription Plans Section */}
       <h1 className="text-3xl font-bold mb-6">Subscription Plans</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => (

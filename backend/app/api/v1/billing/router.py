@@ -107,6 +107,38 @@ async def get_current_subscription(
     
     return subscription
 
+@router.get("/subscription/portal-session", response_model=dict)
+async def get_portal_session(
+    user_data: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Generate a Stripe Billing Portal URL for the user"""
+    try:
+        user_id = user_data.get("sub")
+        subscription = db.query(CustomerSubscription).filter(
+            and_(
+                CustomerSubscription.user_id == user_id,
+                CustomerSubscription.status != SubscriptionStatus.CANCELED
+            )
+        ).first()
+
+        if not subscription:
+            raise HTTPException(status_code=404, detail="No active subscription found")
+
+        billing_portal_session = stripe_service.create_portal_session(
+            customer_id=subscription.stripe_customer_id,
+            return_url=f"{settings.FRONTEND_URL}/dashboard/billing"
+        )
+        
+        return JSONResponse(
+            content={"billing_portal_url": billing_portal_session.url},
+            status_code=200
+        )
+
+    except Exception as e:
+        logger.error(f"Error generating billing portal URL: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate billing portal URL")
+    
 @router.post("/subscription/update-metadata")
 async def update_subscription_metadata(
     user_data: dict = Depends(get_current_user),
