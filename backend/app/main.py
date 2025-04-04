@@ -7,9 +7,6 @@ from .api.v1.core.router import router as core_router
 from app.config import settings
 from .db.session import engine
 from app.models.base import Base
-from fastapi import APIRouter
-
-router = APIRouter()
 
 app = FastAPI(title="Your SaaS API")
 
@@ -25,13 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-router = APIRouter()
-@router.get("/healthcheck", methods=["GET", "HEAD"])
-async def healthcheck():
-    return {"status": "healthy"}
-
 # Include routers
-app.include_router(router, prefix="/api/v1", tags=["root"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(billing_router, prefix="/api/v1/billing", tags=["billing"])
 app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
@@ -39,3 +30,7 @@ app.include_router(core_router, prefix="/api/v1/core", tags=["core"])
 
 
 
+@app.head("/heathcheck")
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "healthy"}
