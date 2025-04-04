@@ -30,7 +30,7 @@ app.include_router(core_router, prefix="/api/v1/core", tags=["core"])
 
 
 
-@app.head("/api/v1/heathcheck")
+@app.head("/api/v1/healthcheck")
 @app.get("/api/v1/healthcheck")
 async def healthcheck():
     return {"status": "healthy"}
