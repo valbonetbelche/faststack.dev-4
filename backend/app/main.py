@@ -28,6 +28,6 @@ app.include_router(billing_router, prefix="/api/v1/billing", tags=["billing"])
 app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
 app.include_router(core_router, prefix="/api/v1/core", tags=["core"])
 
-@app.get("/healthcheck")
+@app.get("/healthcheck", methods=["GET", "HEAD"])
 async def healthcheck():
     return {"status": "healthy"}
