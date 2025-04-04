@@ -28,6 +28,6 @@ app.include_router(billing_router, prefix="/api/v1/billing", tags=["billing"])
 app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
 app.include_router(core_router, prefix="/api/v1/core", tags=["core"])
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Your SaaS API"}
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "healthy"}
