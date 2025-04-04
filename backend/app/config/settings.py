@@ -4,6 +4,9 @@ from typing import Optional
 import os
 
 class Settings(BaseSettings):
+    # Monitoring
+    BETTERSTACK_SOURCE_TOKEN: str
+    BETTERSTACK_INGESTING_HOST: str
     # Database
     DATABASE_URL: str
     

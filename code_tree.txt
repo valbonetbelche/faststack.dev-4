@@ -1,5 +1,7 @@
 ├── .gitignore
+├── INTEGRATED_ROADMAP.md
 ├── README.md
+├── TECH_STACK.md
 ├── backend
 │   ├── .env.local
 │   ├── Dockerfile
@@ -42,12 +44,12 @@
 │   │       ├── exceptions.py
 │   │       ├── logging.py
 │   │       └── stripe.py
-│   ├── requirements.txt
-│   └── tests
+│   └── requirements.txt
 ├── code_tree.txt
 ├── docker-compose.yml
 ├── frontend
 │   ├── .env.local
+│   ├── .gitignore
 │   ├── Dockerfile
 │   ├── README.md
 │   ├── components.json
@@ -76,11 +78,19 @@
 │   │   │   │   ├── dashboard
 │   │   │   │   │   ├── billing
 │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── notes
+│   │   │   │   │   │   └── page.tsx
 │   │   │   │   │   ├── onboarding
 │   │   │   │   │   │   ├── complete-onboarding-form.tsx
 │   │   │   │   │   │   └── page.tsx
-│   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── page.tsx
+│   │   │   │   │   └── reports
+│   │   │   │   │       └── page.tsx
 │   │   │   │   └── layout.tsx
+│   │   │   ├── api
+│   │   │   │   └── public
+│   │   │   │       └── health
+│   │   │   │           └── route.ts
 │   │   │   ├── favicon.ico
 │   │   │   ├── globals.css
 │   │   │   ├── layout.tsx
@@ -88,6 +98,7 @@
 │   │   ├── components
 │   │   │   ├── theme-provider.tsx
 │   │   │   └── ui
+│   │   │       ├── alert-dialog.tsx
 │   │   │       ├── alert.tsx
 │   │   │       ├── badge.tsx
 │   │   │       ├── button.tsx
@@ -97,6 +108,7 @@
 │   │   │       ├── label.tsx
 │   │   │       ├── select.tsx
 │   │   │       ├── sonner.tsx
+│   │   │       ├── spinning-loader.tsx
 │   │   │       └── theme-toggle.tsx
 │   │   ├── lib
 │   │   │   ├── api.ts
@@ -104,4 +116,6 @@
 │   │   ├── middleware.ts
 │   │   └── types.ts
 │   └── tsconfig.json
-└── generate_code_tree.py
+├── generate_code_tree.py
+├── progress_tracker.py
+└── terraform_combined.txt

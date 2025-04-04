@@ -10,3 +10,4 @@ pydantic-settings
 PyJWT
 cryptography
 httpx
+logtail-python
