@@ -9,3 +9,7 @@ export async function GET() {
     { status: 200 }
   );
 }
+
+export async function HEAD() {
+  return new NextResponse(null, { status: 200 });
+}
