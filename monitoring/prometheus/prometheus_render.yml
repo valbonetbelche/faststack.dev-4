@@ -7,9 +7,9 @@ scrape_configs:
     metrics_path: "/metrics"
     scheme: "https"  # Required for Render
     static_configs:
-      - targets: ["${TARGET_HOST}"]  # Will be set in Render dashboard
+      - targets: ["%{TARGET_HOST}"]  # Will be set in Render dashboard
     tls_config:
       insecure_skip_verify: true  # Needed for Render's auto-generated certs
     basic_auth:  # Recommended for production
-      username: "${PROMETHEUS_USER}"
-      password: "${PROMETHEUS_PASSWORD}"
+      username: "%{PROMETHEUS_USER}"
+      password: "%{PROMETHEUS_PASSWORD}"
