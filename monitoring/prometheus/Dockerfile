@@ -2,7 +2,7 @@
 FROM prom/prometheus:v2.47.0
 
 # Copy config files
-COPY prometheus.yml /etc/prometheus/
+COPY prometheus_render.yml /etc/prometheus/
 COPY alerts.yml /etc/prometheus/
 
 # Enable environment variable expansion features
