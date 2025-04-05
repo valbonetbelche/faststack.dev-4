@@ -35,7 +35,7 @@
 | Task                              | Time | Difficulty | Status |
 |-----------------------------------|------|------------|--------|
 | Core architecture setup           | 4h   | High       | ✅     |
-| `/health` endpoint                | 1h   | Low        | [ ]    |
+| `/health` endpoint                | 1h   | Low        | ✅    |
 | Rate limiting (Upstash Redis)     | 2h   | Medium     | [ ]    |
 | Prometheus + Grafana monitoring   | 3h   | High       | [ ]    |
 | Webhook signature verification    | 2h   | Medium     | [ ]    |
@@ -52,9 +52,9 @@
 ## 📊 Observability - Total: 8h
 | Task                              | Time | Difficulty | Status |
 |-----------------------------------|------|------------|--------|
-| Logtail integration               | 2h   | Medium     | [ ]    |
+| Telemetry integration             | 2h   | Medium     | ✅    |
 | Sentry error tracking             | 2h   | Medium     | [ ]    |
-| UptimeRobot monitoring            | 1h   | Low        | [ ]    |
+| Uptime monitoring                 | 1h   | Low        | ✅    |
 | Load test (50 concurrent)         | 3h   | High       | [ ]    |
 
 ## 🛂 Admin Tools - Total: 6h

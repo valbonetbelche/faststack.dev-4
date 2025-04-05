@@ -11,3 +11,4 @@ PyJWT
 cryptography
 httpx
 logtail-python
+prometheus-client

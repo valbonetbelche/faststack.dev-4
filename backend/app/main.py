@@ -10,16 +10,16 @@ from app.api.v1.billing.router import router as billing_router
 from app.api.v1.user.router import router as user_router
 from app.api.v1.core.router import router as core_router
 import logging
+from app.utils.monitoring import metrics_app, instrument_requests
 
-# Application lifespan event handler
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("Application startup completed")
-    yield
-    logger.info("Application shutdown completed")
-    
 # Initialize FastAPI app
 app = FastAPI(title="Your SaaS API")
+
+# Mount metrics endpoint
+app.mount("/metrics", metrics_app)
+
+# Apply monitoring middleware
+app = instrument_requests(app)
 
 # Create database tables (use migrations in production)
 try:

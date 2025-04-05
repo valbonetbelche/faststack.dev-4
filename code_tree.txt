@@ -117,5 +117,9 @@
 │   │   └── types.ts
 │   └── tsconfig.json
 ├── generate_code_tree.py
+├── monitoring
+│   └── prometheus
+│       ├── alerts.yml
+│       └── prometheus.yml
 ├── progress_tracker.py
 └── terraform_combined.txt
