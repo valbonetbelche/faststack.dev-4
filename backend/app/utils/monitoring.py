@@ -1,44 +1,36 @@
-from prometheus_client import Counter, Histogram, make_asgi_app
-from fastapi import Request
-import time
+from prometheus_client import (
+    Counter,
+    Histogram,
+    generate_latest,
+    REGISTRY,
+    CollectorRegistry
+)
+from fastapi import Response, Depends, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import os
 
-# Custom metrics definitions
+# Create a separate registry to avoid conflicts
+registry = CollectorRegistry()
+
+# Define metrics with explicit registry
 REQUEST_COUNT = Counter(
     'http_requests_total',
     'Total HTTP Requests',
-    ['method', 'endpoint', 'status_code']
+    ['method', 'endpoint', 'status_code'],
+    registry=registry
 )
 
 REQUEST_LATENCY = Histogram(
     'http_request_duration_seconds',
     'HTTP Request Latency',
-    ['method', 'endpoint']
+    ['method', 'endpoint'],
+    registry=registry,
+    buckets=[0.1, 0.5, 1, 2.5, 5, 10]  # Betterstack-friendly buckets
 )
 
-# Initialize metrics app
-metrics_app = make_asgi_app()
-
-def instrument_requests(app):
-    """Middleware to track request count and latency"""
-    @app.middleware("http")
-    async def monitor_requests(request: Request, call_next):
-        start_time = time.time()
-        method = request.method
-        endpoint = request.url.path
-        
-        response = await call_next(request)
-        
-        REQUEST_COUNT.labels(
-            method=method,
-            endpoint=endpoint,
-            status_code=response.status_code
-        ).inc()
-        
-        REQUEST_LATENCY.labels(
-            method=method,
-            endpoint=endpoint
-        ).observe(time.time() - start_time)
-        
-        return response
-    
-    return app
+# Metrics endpoint
+def get_metrics():
+    return Response(
+        content=generate_latest(registry),
+        media_type="text/plain"
+    )

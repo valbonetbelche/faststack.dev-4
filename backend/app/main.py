@@ -10,16 +10,54 @@ from app.api.v1.billing.router import router as billing_router
 from app.api.v1.user.router import router as user_router
 from app.api.v1.core.router import router as core_router
 import logging
-from app.utils.monitoring import metrics_app, instrument_requests
-
+from fastapi import FastAPI, Request, HTTPException
+from app.utils.monitoring import (
+    REQUEST_COUNT,
+    REQUEST_LATENCY,
+    get_metrics
+)
 # Initialize FastAPI app
 app = FastAPI(title="Your SaaS API")
 
-# Mount metrics endpoint
-app.mount("/metrics", metrics_app)
+# Add this route AFTER all other routes
+@app.get("/metrics")
+async def metrics(request: Request):
+    # Bypass Render's redirect for health checks
+    if request.headers.get("X-Forwarded-Proto") == "https":
+        return get_metrics()
+    raise HTTPException(status_code=400, detail="Use HTTPS")
 
-# Apply monitoring middleware
-app = instrument_requests(app)
+@app.middleware("http")
+async def track_metrics(request: Request, call_next):
+    """Middleware to record metrics"""
+    start_time = time.time()
+    method = request.method
+    endpoint = request.url.path
+    
+    try:
+        response = await call_next(request)
+        
+        # Record metrics
+        REQUEST_COUNT.labels(
+            method=method,
+            endpoint=endpoint,
+            status_code=response.status_code
+        ).inc()
+        
+        REQUEST_LATENCY.labels(
+            method=method,
+            endpoint=endpoint
+        ).observe(time.time() - start_time)
+        
+        return response
+        
+    except Exception as e:
+        REQUEST_COUNT.labels(
+            method=method,
+            endpoint=endpoint,
+            status_code=500
+        ).inc()
+        raise
 
 # Create database tables (use migrations in production)
 try:
