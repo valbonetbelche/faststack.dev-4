@@ -1,11 +1,11 @@
-# Use official Prometheus image
-FROM prom/prometheus:v2.47.0
+# Stage 1: build config with envsubst
+FROM alpine:latest as config-builder
+RUN apk add --no-cache gettext && mkdir -p /template
+COPY prometheus.yml.template /template/prometheus.yml.template
+RUN envsubst < /template/prometheus.yml.template > /template/prometheus.yml
 
-# Copy config files
-COPY prometheus.yml /etc/prometheus/
-COPY alerts.yml /etc/prometheus/
+# Stage 2: actual Prometheus image
+FROM prom/prometheus:latest
+COPY --from=config-builder /template/prometheus.yml /etc/prometheus/prometheus.yml
 
-# Enable environment variable expansion features
-CMD ["--config.file=/etc/prometheus/prometheus.yml", \
-     "--enable-feature=expand-external-labels", \
-     "--enable-feature=expand-external-vars"]
+CMD ["--config.file=/etc/prometheus/prometheus.yml"]

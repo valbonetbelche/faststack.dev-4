@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "fastapi"
+    metrics_path: "/metrics"  # Default endpoint exposed by instrumentator
+    static_configs:
+      - targets: ["${TARGET_HOST}"]  # "backend" = Docker service name
+
+  - job_name: "prometheus"  # Monitor Prometheus itself
+    static_configs:
+      - targets: ["localhost:9090"]

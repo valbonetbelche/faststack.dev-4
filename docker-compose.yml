@@ -41,16 +41,16 @@ services:
       - saas_network
 
   prometheus:
-    image: prom/prometheus
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
     container_name: prometheus
     ports:
       - "9090:9090"
     env_file:
       - ./monitoring/prometheus/.env.local
     volumes:
-      - ./monitoring/prometheus:/etc/prometheus  # Mount config file
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - ./monitoring/prometheus:/etc/prometheus/template  # Mount config file
     networks:
       - saas_network
 
