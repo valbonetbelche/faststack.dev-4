@@ -45,6 +45,8 @@ services:
     container_name: prometheus
     ports:
       - "9090:9090"
+    env_file:
+      - ./monitoring/prometheus/.env.local
     volumes:
       - ./monitoring/prometheus:/etc/prometheus  # Mount config file
     command:
