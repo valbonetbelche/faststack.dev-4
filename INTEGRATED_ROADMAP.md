@@ -15,7 +15,7 @@
 | Stripe checkout session creation  | 2h   | Medium     | ✅     |
 | Subscription plans model          | 1h   | Low        | ✅     |
 | Stripe webhook (checkout.completed)| 3h  | High       | ✅     |
-| Handle cancel/payment_failed webhooks | 3h | High    | [ ]     |
+| Handle cancel/payment_failed webhooks | 3h | High     | [ ]    |
 | Grace period for failed payments  | 2h   | Medium     | [ ]    |
 | Invoice history UI                | 3h   | Medium     | [ ]    |
 | Subscription upgrade/downgrade    | 2h   | High       | [ ]    |
@@ -35,9 +35,9 @@
 | Task                              | Time | Difficulty | Status |
 |-----------------------------------|------|------------|--------|
 | Core architecture setup           | 4h   | High       | ✅     |
-| `/health` endpoint                | 1h   | Low        | ✅    |
-| Rate limiting (Upstash Redis)     | 2h   | Medium     | [ ]    |
-| Prometheus + Grafana monitoring   | 3h   | High       | [ ]    |
+| `/healthcheck` endpoint           | 1h   | Low        | ✅     |
+| Rate limiting (Upstash Redis)     | 2h   | Medium     | [ ]     |
+| Prometheus Integration            | 1h   | High       | ✅     |
 | Webhook signature verification    | 2h   | Medium     | [ ]    |
 | Backup cron job setup             | 2h   | Medium     | [ ]    |
 
@@ -52,9 +52,11 @@
 ## 📊 Observability - Total: 8h
 | Task                              | Time | Difficulty | Status |
 |-----------------------------------|------|------------|--------|
-| Telemetry integration             | 2h   | Medium     | ✅    |
+| Betterstack Telemetry integration | 1h   | Medium     | ✅    |
+| Betterstack Uptime integration    | 1h   | Medium     | ✅    |
+| Betterstack Prometheus integration| 1h   | Medium     | ✅    |
+| Backend Betterstack Dashboard     | 2h   | Medium     | ✅    |
 | Sentry error tracking             | 2h   | Medium     | [ ]    |
-| Uptime monitoring                 | 1h   | Low        | ✅    |
 | Load test (50 concurrent)         | 3h   | High       | [ ]    |
 
 ## 🛂 Admin Tools - Total: 6h
