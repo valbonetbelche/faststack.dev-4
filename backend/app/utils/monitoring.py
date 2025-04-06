@@ -1,18 +1,20 @@
+# app/utils/monitoring.py
+
 from prometheus_client import (
     Counter,
     Histogram,
+    Gauge,
     generate_latest,
-    REGISTRY,
     CollectorRegistry
 )
-from fastapi import Response, Depends, HTTPException
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-import os
+from fastapi import Request, Response, HTTPException
+import time
+import logging
 
-# Create a separate registry to avoid conflicts
+# Create a custom registry
 registry = CollectorRegistry()
 
-# Define metrics with explicit registry
+# Metrics definitions
 REQUEST_COUNT = Counter(
     'http_requests_total',
     'Total HTTP Requests',
@@ -22,15 +24,77 @@ REQUEST_COUNT = Counter(
 
 REQUEST_LATENCY = Histogram(
     'http_request_duration_seconds',
-    'HTTP Request Latency',
+    'HTTP Request Latency in Seconds',
     ['method', 'endpoint'],
     registry=registry,
-    buckets=[0.1, 0.5, 1, 2.5, 5, 10]  # Betterstack-friendly buckets
+    buckets=[0.1, 0.5, 1, 2.5, 5, 10]
 )
 
+IN_PROGRESS = Gauge(
+    'http_requests_in_progress',
+    'In-progress HTTP Requests',
+    ['method', 'endpoint'],
+    registry=registry
+)
+
+EXCEPTIONS_COUNT = Counter(
+    'http_exceptions_total',
+    'Total HTTP Exceptions',
+    ['exception_type', 'endpoint'],
+    registry=registry
+)
+
+
+# Middleware to track request metrics
+async def prometheus_middleware(request: Request, call_next):
+    method = request.method
+    endpoint = request.url.path
+    start_time = time.time()
+
+    IN_PROGRESS.labels(method=method, endpoint=endpoint).inc()
+    try:
+        response = await call_next(request)
+        duration = time.time() - start_time
+
+        REQUEST_COUNT.labels(
+            method=method,
+            endpoint=endpoint,
+            status_code=response.status_code
+        ).inc()
+
+        REQUEST_LATENCY.labels(
+            method=method,
+            endpoint=endpoint
+        ).observe(duration)
+
+        return response
+
+    except Exception as e:
+        duration = time.time() - start_time
+
+        REQUEST_COUNT.labels(
+            method=method,
+            endpoint=endpoint,
+            status_code=500
+        ).inc()
+
+        EXCEPTIONS_COUNT.labels(
+            exception_type=type(e).__name__,
+            endpoint=endpoint
+        ).inc()
+
+        raise
+
+    finally:
+        IN_PROGRESS.labels(method=method, endpoint=endpoint).dec()
+
+
 # Metrics endpoint
-def get_metrics():
-    return Response(
-        content=generate_latest(registry),
-        media_type="text/plain"
-    )
+async def metrics_endpoint(request: Request):
+    # Optional HTTPS-only check (keep if needed)
+    if request.headers.get("X-Forwarded-Proto") == "https":
+        return Response(
+            content=generate_latest(registry),
+            media_type="text/plain"
+        )
+    raise HTTPException(status_code=400, detail="Use HTTPS")
