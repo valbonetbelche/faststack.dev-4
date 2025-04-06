@@ -1,0 +1,3 @@
+Add the rate limiter to all endpoints by category
+Add the caching on crud operations as needed
+After building clerk and stripe webhooks fully, add caching as needed, like await cache_delete(f"user:{user_id}:profile") when a profile is updated

@@ -12,3 +12,5 @@ cryptography
 httpx
 logtail-python
 prometheus-client
+redis
+fastapi-limiter

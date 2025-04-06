@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field
+from pydantic import Field, field_validator
 from typing import Optional
 import os
 
@@ -7,8 +7,12 @@ class Settings(BaseSettings):
     # Monitoring
     BETTERSTACK_SOURCE_TOKEN: str
     BETTERSTACK_INGESTING_HOST: str
+    
     # Database
     DATABASE_URL: str
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
     
     # Clerk
     CLERK_API_URL: str
@@ -32,9 +36,23 @@ class Settings(BaseSettings):
     TWILIO_AUTH_TOKEN: str
     TWILIO_PHONE_NUMBER: str
     
-    # App Settings
     FROM_EMAIL: str = "noreply@yourdomain.com"
-    ENVIRONMENT: str = "development"
+    
+    # API Documentation
+    API_BASE_URL: str = "http://localhost:8000"
+    API_DESCRIPTION: str = "Production SaaS API"
+    API_VERSION: str = "1.0.0"
+    ENVIRONMENT: str = "development"  # or "production"
+    DOCS_SWAGGER_URL: Optional[str] = "/docs"
+    DOCS_REDOC_URL: Optional[str] = "/redoc"
+    OPENAPI_URL: Optional[str] = "/openapi.json"
+    
+    # Disable docs in production
+    @field_validator('DOCS_SWAGGER_URL', 'DOCS_REDOC_URL', 'OPENAPI_URL', mode='before')
+    def validate_docs(cls, v, values):
+        if values.data.get('ENVIRONMENT') == "production":
+            return None
+        return v
     
     class Config:
         env_file = ".env.local"

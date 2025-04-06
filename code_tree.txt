@@ -8,6 +8,8 @@
 │   ├── app
 │   │   ├── api
 │   │   │   ├── deps.py
+│   │   │   ├── middleware
+│   │   │   │   └── rate_limiter.py
 │   │   │   └── v1
 │   │   │       ├── auth
 │   │   │       │   └── router.py
@@ -43,6 +45,8 @@
 │   │       ├── clerk.py
 │   │       ├── exceptions.py
 │   │       ├── logging.py
+│   │       ├── monitoring.py
+│   │       ├── redis.py
 │   │       └── stripe.py
 │   └── requirements.txt
 ├── code_tree.txt
@@ -117,9 +121,6 @@
 │   │   └── types.ts
 │   └── tsconfig.json
 ├── generate_code_tree.py
-├── monitoring
-│   └── prometheus
-│       ├── alerts.yml
-│       └── prometheus.yml
 ├── progress_tracker.py
+├── tasks_to_remember.txt
 └── terraform_combined.txt

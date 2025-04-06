@@ -23,6 +23,7 @@ from app.schemas.billing import (
 from app.api.deps import get_current_user
 from app.config.settings import settings
 from app.utils.clerk import clerk_client
+from app.utils.redis import cached
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -34,11 +35,13 @@ def read_root():
     return {"message": "Billing Service Running"}
 
 @router.get("/plans/", response_model=list[Plan])
-def get_plans(db: Session = Depends(get_db)):
+@cached(ttl=3600, key_prefix="billing_plans")
+def get_plans(request: Request, db: Session = Depends(get_db)):
     plans = get_subscription_plans(db)
     return plans
 
 @router.get("/plans/{plan_id}", response_model=Plan)
+@cached(ttl=3600, key_prefix="billing:plan:{plan_id}")
 def get_plan(plan_id: int, db: Session = Depends(get_db)):
     """Get details of a specific plan"""
     plan = get_subscription_plan_by_id(db, plan_id)
@@ -88,6 +91,7 @@ async def create_checkout_session(
         )
 
 @router.get("/subscription/current", response_model=SubscriptionResponse)
+@cached(ttl=60, key_prefix="user:{user_id}:subscription")
 async def get_current_subscription(
     user_data: dict = Depends(get_current_user),
     db: Session = Depends(get_db)

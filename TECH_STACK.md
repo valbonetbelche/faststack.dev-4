@@ -14,7 +14,7 @@
 ## 👀 Monitoring & Observability
 - **Error Tracking**: Sentry (frontend + backend)
 - **Logs**: Betterstack Telemetry (backend logs)
-- **Metrics**: Grafana Cloud + Prometheus (self-hosted on Render)
+- **Metrics**: Betterstack Prometheus
 - **Uptime Monitoring**: Betterstack Uptime
 
 ## 📈 Analytics
