@@ -46,6 +46,11 @@ app.add_api_route("/metrics", metrics_endpoint, methods=["GET"])
 async def healthcheck():
     return {"status": "healthy"}
 
+# Simulate error for development
+@app.get("/api/v1/dev-error")
+async def dev_error():
+    raise ValueError("Intentional error")
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
