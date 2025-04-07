@@ -36,9 +36,10 @@
 |-----------------------------------|------|------------|--------|
 | Core architecture setup           | 4h   | High       | ✅     |
 | `/healthcheck` endpoint           | 1h   | Low        | ✅     |
-| Rate limiting (Upstash Redis)     | 2h   | Medium     | [ ]     |
+| Rate limiting (Upstash Redis)     | 2h   | Medium     | ✅     |
+| Caching (Upstash Redis)           | 2h   | Medium     | ✅     |
 | Prometheus Integration            | 1h   | High       | ✅     |
-| Webhook signature verification    | 2h   | Medium     | [ ]    |
+| Webhook signature verification    | 2h   | Medium     | ✅     |
 | Backup cron job setup             | 2h   | Medium     | [ ]    |
 
 ## 📦 Storage (Cloudflare R2/Supabase) - Total: 6h
