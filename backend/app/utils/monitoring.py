@@ -9,7 +9,34 @@ from prometheus_client import (
 )
 from fastapi import Request, Response, HTTPException
 import time
+import sentry_sdk
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+from app.config.settings import settings
 import logging
+
+
+def init_sentry():
+    # Initialize Sentry if DSN is configured
+    if settings.SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            integrations=[
+                SqlalchemyIntegration(),
+                RedisIntegration(),
+                LoggingIntegration(
+                    level=logging.INFO,        # Capture info and above as breadcrumbs
+                    event_level=logging.ERROR  # Send errors as events
+                )
+            ],
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+            environment=settings.ENVIRONMENT,
+            send_default_pii=True  # Optional: Enable if you need user data in errors
+        )
+
 
 # Create a custom registry
 registry = CollectorRegistry()

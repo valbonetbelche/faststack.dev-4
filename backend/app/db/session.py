@@ -9,19 +9,13 @@ from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
-# Connection pool configuration
-POOL_SIZE = 15
-MAX_OVERFLOW = 10
-POOL_RECYCLE = 3600  # Recycle connections after 1 hour
-POOL_PRE_PING = True  # Enable connection health checks
-
 def get_sync_engine():
     """Create and configure synchronous SQLAlchemy engine"""
     return create_engine(
         settings.DATABASE_URL,
-        pool_size=POOL_SIZE,
-        max_overflow=MAX_OVERFLOW,
-        pool_pre_ping=POOL_PRE_PING,  # Check connections before use
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        pool_pre_ping=settings.DATABASE_POOL_PRE_PING,  # Check connections before use
         connect_args={
             "keepalives": 1,
             "keepalives_idle": 30,
@@ -33,11 +27,11 @@ def get_sync_engine():
 def get_async_engine():
     """Create and configure asynchronous SQLAlchemy engine"""
     return create_async_engine(
-        settings.ASYNC_DATABASE_URL,
-        pool_size=POOL_SIZE,
-        max_overflow=MAX_OVERFLOW,
-        pool_recycle=POOL_RECYCLE,
-        pool_pre_ping=POOL_PRE_PING,
+        settings.DATABASE_ASYNC_URL,
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        pool_recycle=settings.DATABASE_POOL_RECYCLE,
+        pool_pre_ping=settings.DATABASE_POOL_PRE_PING,
         connect_args={
             "keepalives": 1,
             "keepalives_idle": 30,

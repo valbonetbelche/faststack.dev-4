@@ -4,13 +4,23 @@ from typing import Optional
 import os
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str
+    
     # Monitoring
     BETTERSTACK_SOURCE_TOKEN: str
     BETTERSTACK_INGESTING_HOST: str
+    SENTRY_DSN: str
     
     # Database
     DATABASE_URL: str
-    ASYNC_DATABASE_URL: str
+    DATABASE_ASYNC_URL: str
+    DATABASE_SSL: bool
+    DATABASE_POOL_SIZE: int
+    DATABASE_MAX_OVERFLOW: int
+    DATABASE_POOL_RECYCLE: int
+    DATABASE_POOL_PRE_PING: bool
+    
+    # Redis
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_PASSWORD: str
@@ -43,10 +53,10 @@ class Settings(BaseSettings):
     API_BASE_URL: str = "http://localhost:8000"
     API_DESCRIPTION: str = "Production SaaS API"
     API_VERSION: str = "1.0.0"
-    ENVIRONMENT: str = "development"  # or "production"
     DOCS_SWAGGER_URL: Optional[str] = "/docs"
     DOCS_REDOC_URL: Optional[str] = "/redoc"
     OPENAPI_URL: Optional[str] = "/openapi.json"
+    OPENAPI_TAGS_METADATA: list[dict]
     
     # Disable docs in production
     @field_validator('DOCS_SWAGGER_URL', 'DOCS_REDOC_URL', 'OPENAPI_URL', mode='before')

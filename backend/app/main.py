@@ -13,17 +13,31 @@ from app.utils.redis import close_redis
 from app.utils.monitoring import (
     prometheus_middleware,
     metrics_endpoint,
+    init_sentry
 )
 from app.api.middleware.rate_limiter import init_rate_limiter, rate_limit_exception_handler, get_limit
+from app.config.settings import settings
 
-app = FastAPI(
-    title="Your SaaS API",
-    redoc_url=None,  # Disable Redoc
-    docs_url="/docs",  # Explicit docs URL
-    openapi_url="/openapi.json",  # Explicit OpenAPI URL
-    servers=[{"url": "http://localhost:8000", "description": "Local development"}]
-)
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title="Your SaaS API",
+        description=settings.API_DESCRIPTION,
+        version=settings.API_VERSION,
+        redoc_url=settings.DOCS_REDOC_URL,
+        docs_url=settings.DOCS_SWAGGER_URL,
+        openapi_url=settings.OPENAPI_URL,
+        servers=[
+            {
+                "url": settings.API_BASE_URL,
+                "description": settings.ENVIRONMENT
+            }
+        ],
+        # Security headers
+        openapi_tags=settings.OPENAPI_TAGS_METADATA
+    )
+    return app
 
+app = create_app()
 # Add rate limiter exception handler
 app.add_exception_handler(HTTPException, rate_limit_exception_handler)
 
@@ -32,6 +46,9 @@ app.middleware("http")(prometheus_middleware)
 
 # Request logging middleware
 app.middleware("http")(logging_middleware)
+
+# Sentry initialization (if configured)
+init_sentry()
 
 # Metrics route
 app.add_api_route("/metrics", metrics_endpoint, methods=["GET"])
