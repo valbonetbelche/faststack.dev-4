@@ -97,9 +97,12 @@ export default function BillingPage() {
     try {
       const token = await getToken();
       if (token) {
-        const url = await publicApi.getStripeBillingUrl(token);
-        console.log(url);
-        window.open(url, "_blank");
+        const url = await publicApi.getStripePortalSessionUrl(token);
+        if (url) {
+          window.open(url, "_blank");
+        } else {
+          toast.error("Failed to retrieve the Stripe Billing Portal URL. Please try again later.");
+        }
       }
     } catch (error) {
       console.error("Failed to set the Stripe Billing Url:", error);

@@ -106,8 +106,8 @@ export const publicApi = {
     return response.data;
   },
 
-  getStripeBillingUrl: async (token: string) => {
-    const response = await publicApiClient.get("/billing/subscription/billing-portal", {
+  getStripePortalSessionUrl: async (token: string) => {
+    const response = await publicApiClient.get("/billing/subscription/portal-session", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
