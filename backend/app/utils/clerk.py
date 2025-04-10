@@ -27,6 +27,7 @@ class ClerkClient:
                 response.raise_for_status()
                 return response.json()
         except httpx.HTTPStatusError as e:
+            print("------------------ ERROR UPDATING METADATA ------------------")
             raise HTTPException(
                 status_code=e.response.status_code,
                 detail=f"Clerk API error: {str(e)}"

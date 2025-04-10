@@ -29,6 +29,10 @@ def parse_timespan(limit_key: str) -> int:
         return config["hours"] * 3600
     return 60  # Default fallback
 
+def noop_dependency():
+    """A no-op dependency that does nothing."""
+    pass
+
 def get_limit(limit_key: str) -> RateLimiter:
     """
     Create rate limiter dependency from preset
@@ -37,6 +41,10 @@ def get_limit(limit_key: str) -> RateLimiter:
     if limit_key not in DEFAULT_LIMITS:
         raise ValueError(f"Unknown limit key: {limit_key}")
     
+    # Exclude webhooks from rate limiting
+    if limit_key == "webhooks":
+        return noop_dependency  # Return a no-op callable
+
     return RateLimiter(
         times=DEFAULT_LIMITS[limit_key]["times"],
         seconds=parse_timespan(limit_key)

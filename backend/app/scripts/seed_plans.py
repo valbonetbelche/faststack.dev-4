@@ -90,25 +90,51 @@ def create_stripe_product_and_price(plan_data: dict):
         print(f"Unexpected error: {str(e)}")
         raise
 
+def plans_already_seeded(db: Session) -> bool:
+    """Check if the subscription plans already exist in the database."""
+    inspector = inspect(engine)
+    if 'subscription_plans' not in inspector.get_table_names():
+        # Table does not exist, so plans cannot be seeded
+        return False
+
+    existing_plans = db.query(SubscriptionPlan).all()
+    if len(existing_plans) != len(SUBSCRIPTION_PLANS):
+        return False
+
+    for plan_data in SUBSCRIPTION_PLANS:
+        matching_plan = next(
+            (plan for plan in existing_plans if plan.name == plan_data['name'] and plan.price == plan_data['price']),
+            None
+        )
+        if not matching_plan:
+            return False
+
+    return True
+
 def seed_plans():
-    """Seed the subscription plans in both Stripe and the local database"""
+    """Seed the subscription plans in both Stripe and the local database."""
     db = next(get_db())
     try:
+        # Check if plans are already seeded
+        if plans_already_seeded(db):
+            print("Plans are already seeded. Skipping script execution.")
+            return
+
         # Wait for table or create it
         if not wait_for_table(db):
             print("Creating database tables...")
             Base.metadata.create_all(bind=engine)
-            
+
         print("Clearing existing data...")
         db.execute(text('TRUNCATE TABLE customer_subscriptions CASCADE'))
         db.execute(text('TRUNCATE TABLE subscription_plans CASCADE'))
         db.commit()
-        
+
         print("Inserting new plans...")
         for plan_data in SUBSCRIPTION_PLANS:
             try:
                 product, price = create_stripe_product_and_price(plan_data)
-                
+
                 plan = SubscriptionPlan(
                     name=plan_data['name'],
                     description=plan_data['description'],
@@ -119,17 +145,17 @@ def seed_plans():
                     billing_interval='month',
                     is_active=True
                 )
-                
+
                 db.add(plan)
                 print(f"Added plan: {plan_data['name']} (Stripe Price ID: {price.id})")
-            
+
             except Exception as e:
                 print(f"Error setting up plan {plan_data['name']}: {str(e)}")
                 continue
-        
+
         db.commit()
         print("Successfully seeded subscription plans!")
-    
+
     except Exception as e:
         print(f"Error seeding plans: {str(e)}")
         traceback.print_exc()

@@ -1,3 +1,4 @@
 Add the rate limiter to all endpoints by category
 Add the caching on crud operations as needed
 After building clerk and stripe webhooks fully, add caching as needed, like await cache_delete(f"user:{user_id}:profile") when a profile is updated
+Sentry is only setup on frontend for client. If I want server too, I need to add a sentry instrumentation file

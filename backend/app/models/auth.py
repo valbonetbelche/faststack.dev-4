@@ -69,7 +69,6 @@ class ClerkHTTPBearer(HTTPBearer):
 
     def _decode_token(self, token: str) -> Optional[Dict[str, Any]]:
         try:
-            print("DECODING TOKEN", token)
             signing_key = self.jwks_client.get_signing_key_from_jwt(token)
             return jwt.decode(
                 token,
@@ -84,7 +83,6 @@ class ClerkHTTPBearer(HTTPBearer):
                 },
             )
         except Exception as e:
-            print(f"Error decoding token: {e}")
             if self.debug_mode:
                 raise e
             return None

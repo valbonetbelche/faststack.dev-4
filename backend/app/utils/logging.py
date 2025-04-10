@@ -35,9 +35,18 @@ async def logging_middleware(request: Request, call_next):
 
     try:
         response = await call_next(request)
+    except HTTPException as http_exc:
+        duration = (time.time() - start_time) * 1000
+        logger.error(
+            f"HTTPException {http_exc.status_code} for {request.method} {request.url.path} "
+            f"in {duration:.2f}ms: {http_exc.detail}"
+        )
+        raise
     except Exception as e:
         duration = (time.time() - start_time) * 1000
-        logger.error(f"Failed {request.method} {request.url.path} in {duration:.2f}ms", exc_info=True)
+        logger.error(
+            f"Failed {request.method} {request.url.path} in {duration:.2f}ms", exc_info=True
+        )
         
         # Capture exception in Sentry if configured
         if settings.SENTRY_DSN:
@@ -52,7 +61,10 @@ async def logging_middleware(request: Request, call_next):
 
     duration = (time.time() - start_time) * 1000
     if request.url.path not in ["/api/v1/healthcheck"]:
-        logger.info(f"Completed {request.method} {request.url.path} {response.status_code} in {duration:.2f}ms")
+        logger.info(
+            f"Completed {request.method} {request.url.path} {response.status_code} "
+            f"in {duration:.2f}ms"
+        )
 
     return response
 

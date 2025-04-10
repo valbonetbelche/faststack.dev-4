@@ -57,7 +57,7 @@
 | Betterstack Uptime integration    | 1h   | Medium     | ✅    |
 | Betterstack Prometheus integration| 1h   | Medium     | ✅    |
 | Backend Betterstack Dashboard     | 2h   | Medium     | ✅    |
-| Sentry error tracking             | 2h   | Medium     | [ ]    |
+| Sentry error tracking             | 3h   | Medium     | ✅    |
 | Load test (50 concurrent)         | 3h   | High       | [ ]    |
 
 ## 🛂 Admin Tools - Total: 6h

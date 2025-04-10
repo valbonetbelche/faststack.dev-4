@@ -51,6 +51,11 @@ class StripeService:
                 cancel_url=cancel_url,
                 metadata={
                     'clerk_user_id': user_id
+                },
+                subscription_data={
+                    'metadata': {
+                        'clerk_user_id': user_id
+                    }
                 }
             )
 
